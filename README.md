@@ -1,5 +1,3 @@
-# EXERCICIOBD
-ABUBUBLE
 
 -- ex 11
 
@@ -120,7 +118,7 @@ alter table tbVenda add foreign key (ID_Cli) references tbCliente (ID);
 alter table tbItemVenda add foreign key (NumeroVenda) references tbVenda (NumeroVenda);
 alter table tbItemVenda add foreign key (CodigoBarras) references tbProduto (CodigoBarras);
 
------------------------------------------------------------------------------------------------------------------------------
+
 -- ex 1
 use dbdistribuidora;
 
@@ -278,7 +276,7 @@ DESCRIBE tbClientePJ;
 DESCRIBE tbEndereco;
 select * from tbCliente;
 
-
+drop procedure spinsertclientepf;
 delimiter &&
 create procedure spinsertclientepf(vNomeCli varchar(200), vNumEnd smallint, vCompEnd varchar(50), vCepCli numeric(8), vCPF numeric(11), vRG numeric(8), vRG_Dig char(1), vNasc date, vLogradouro varchar(200), vBairro varchar(200), vCidade varchar(200), vUF char(2))
 begin
@@ -553,7 +551,6 @@ call spattprod(12345678910111, 'rei do papel mache', 64.50);
 call spattprod(12345678910112, 'bolinha de sabão', 120.00);
 call spattprod(12345678910113, 'carro bate bate', 64.00);
 
-
 -- ex 15 --
 delimiter &&
 create procedure spselectproduto()
@@ -599,7 +596,7 @@ call spinsertproduto(12345678910119, 'Água mineral', 1.99, 500);
 select * from tbProduto;
 select * from tb_ProdutoHistorico;
 
-------------------------------------------------------------------------------------
+
 -- ex 20 --
 delimiter &&
 create trigger trgprodhistupd before update on tbProduto
@@ -633,5 +630,26 @@ select * from tbVenda order by NumeroVenda desc limit 1;
 select * from tbItemVenda order by NumeroVenda desc limit 1;
 
 -- EXE 25 --
-delimeter &&
-create procedure spinsertconsulta (v)
+delimiter &&
+create procedure spinsertconsulta (vNomeCli varchar(200))
+begin
+    select * from tbCliente where vNomeCli = NomeCli;
+end &&
+call spinsertconsulta ('Disney Chaplin');
+
+select * from tbCliente;
+
+-- Exe 26 -- 
+drop trigger tgUpdateProd;
+delimiter //
+Create trigger tgUpdateProd  after insert on tbItemVenda
+for each row 
+ begin 
+	update tbProduto 
+		set Qtd = Qtd - 1
+    Where CodigoBarras = NEW.CodigoBarras;
+    
+end //
+
+select * from tbProduto;
+call spinsertproduto(12345678910131, 'Blusa Frio Moletom', 200.00, 100);

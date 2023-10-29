@@ -1,4 +1,3 @@
-
 -- ex 11
 
 create database dbDistribuidora;
@@ -498,17 +497,7 @@ call spinsertNF(360, "Lança Perfume");
 select * from tbNota_Fiscal;
 select * from tbVenda;
 
--- ex 12 - igual o outro de inserir produtos?
-/*
-delimiter &&
-create procedure spinsertproduto(vCodigoBarras numeric(14), vNome varchar (200), vValor decimal (8,3), vQtd int)
-begin
-	IF NOT EXISTS  (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
-    insert into tbProduto(CodigoBarras, Nome, Valor, Qtd)
-        values(vCodigoBarras, vNome, vValor, vQtd);
-        end if;
-end &&
-*/
+-- ex 12 --
 call spinsertproduto(12345678910130, 'Camiseta de Poliéster', 35.61, 100);
 call spinsertproduto(12345678910131, 'Blusa Frio Moletom', 200.00, 100);
 call spinsertproduto(12345678910132, 'Vestido Decote Redondo', 144.00, 50);
@@ -640,16 +629,22 @@ call spinsertconsulta ('Disney Chaplin');
 select * from tbCliente;
 
 -- Exe 26 -- 
-drop trigger tgUpdateProd;
-delimiter //
-Create trigger tgUpdateProd  after insert on tbItemVenda
-for each row 
- begin 
-	update tbProduto 
-		set Qtd = Qtd - 1
-    Where CodigoBarras = NEW.CodigoBarras;
-    
-end //
+delimiter && 
+create trigger trg_updatetbProduto after insert on tbItemVenda
+	for each row 
+begin
+UPDATE tbProduto set Qtd = Qtd - NEW.Qtd
+Where CodigoBarras = NEW.CodigoBarras;
+end &&
+select  * from tbCliente;
+select  * from tbProduto;
+select * from tbVenda;
+select * from tbItemCompra;
+call spinsertVenda (4,'Disney Chaplin', 12345678910111, 22.22, 1, 64.50, null );
+call spinsertVenda (5,'Disney Chaplin', 12345678910112, 22.220, 1, 64.50, null );
 
-select * from tbProduto;
-call spinsertproduto(12345678910131, 'Blusa Frio Moletom', 200.00, 100);
+-- Exe 27 --
+ /* Perguntar sobre esse exercício ao professor */
+ call spinsertVenda (6,'Paganada', 12345678910114, 10.00, 15, 150.00, null );
+
+-- 	Exe 28

@@ -1,5 +1,3 @@
--- ex 11
-
 create database dbDistribuidora;
 use dbDistribuidora;
 
@@ -275,7 +273,7 @@ DESCRIBE tbClientePJ;
 DESCRIBE tbEndereco;
 select * from tbCliente;
 
-drop procedure spinsertclientepf;
+-- drop procedure spinsertclientepf;
 delimiter &&
 create procedure spinsertclientepf(vNomeCli varchar(200), vNumEnd smallint, vCompEnd varchar(50), vCepCli numeric(8), vCPF numeric(11), vRG numeric(8), vRG_Dig char(1), vNasc date, vLogradouro varchar(200), vBairro varchar(200), vCidade varchar(200), vUF char(2))
 begin
@@ -385,7 +383,7 @@ describe tbFornecedor;
 describe tbProduto;
 describe tbCompra;
 
-drop procedure spinsertcompra;
+-- drop procedure spinsertcompra;
 
 delimiter &&
 create procedure spinsertcompra(vNotaFiscal int, vNome varchar(200), vDataCompra date, vCodigoBarras numeric(14), vValorItem decimal(8,3), vQtdTotal int, vValorTotal decimal(8,2))
@@ -423,36 +421,36 @@ select * from tbItemCompra;
 
 ----------------------------------------------------------------------------------
 -- ex 10
-drop procedure spInsertVenda;
+-- drop procedure spInsertVenda;
 
 delimiter &&
-create procedure spinsertvenda(vNumeroVenda int, vNomeCli varchar(200), vCodigoBarras numeric(14), vValorItem decimal(8,3), vQtd int, vTotalVenda decimal(8,3), vNF int)
+create procedure spinsertvenda(vNumeroVenda int, vNomeCli varchar(200), vCodigoBarras numeric(14,0),
+                               vValorItem decimal(8,3), vQtd int, vTotalVenda decimal(8,3))
 begin 
-
-		if (select ID from tbCliente where NomeCli = vNomeCli) then 
+		if  exists (select ID from tbCliente where NomeCli = vNomeCli) and 
+        exists (select CodigoBarras from tbProduto where  CodigoBarras = vCodigoBarras)then 
+        
 			set @ID = (select ID from tbCliente where NomeCli = vNomeCli);
-            set @NotaFiscal = (select NF from tbNota_Fiscal where NF = vNF);
-            -- atualizar tbProduto quando uma venda for feita
-            set @qtd = (select qtd from tbProduto where CodigoBarras = vCodigoBarras) - vQtd;
-            
-            if (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
-				if not exists (select NumeroVenda from tbVenda where NumeroVenda = vNumeroVenda) then 
-					insert into tbvenda (NumeroVenda, DataVenda, TotalVenda, ID_Cli, NF) 
-						values (vNumeroVenda, current_date(), vTotalVenda, @ID, vNF);
-                        
+     
+			if not exists (select NumeroVenda from tbVenda where NumeroVenda = vNumeroVenda) then 
+					insert into tbvenda (NumeroVenda, DataVenda, TotalVenda, ID_Cli) 
+						values (vNumeroVenda, current_date(), vTotalVenda, @ID);
+				end if; 
+			    
+                if not exists ( select NumeroVenda from tbItemVenda where NumeroVenda = vNumeroVenda and CodigoBarras = vCodigoBarras )then
                     insert into tbItemVenda (NumeroVenda, CodigoBarras, ValorItem, Qtd) 
-						values (vNumeroVenda, vCodigoBarras, vQtd, vValorItem);
-                    update tbproduto set qtd = @qtd where CodigoBarras = vCodigoBarras;
-				end if;
-            end if;
+						values (vNumeroVenda, vCodigoBarras, vValorItem, vQtd);
+	            end if;
+            else 
+             select 'Cliente ou produto não cadastrado' as 'Atenção!';
 		end if;
 end &&
 describe tbItemVenda;
 describe tbNota_Fiscal;
 
-call spInsertVenda(1, "Pimpão", 12345678910111, 54.61, 1, 54.61, null);
-call spInsertVenda(2, "Lança Perfume", 12345678910112, 100.45, 2, 200.90, null);
-call spInsertVenda(3, "Pimpão", 12345678910113, 44.00, 1, 44.00, null);  
+call spInsertVenda(1, "Pimpão", 12345678910111, 54.61, 1, 54.61);
+call spInsertVenda(2, "Lança Perfume", 12345678910112, 100.45, 2, 200.90);
+call spInsertVenda(3, "Pimpão", 12345678910113, 44.00, 1, 44.00);  
 
 -- ver os registros --
 select * from tbVenda;
@@ -468,7 +466,7 @@ describe tbCliente;
 describe tbVenda;
 describe tbNota_Fiscal;
 
-drop procedure spInsertNF;
+ -- drop procedure spInsertNF;
 
 delimiter &&
 create procedure spinsertNF(vNF int, vNomeCli varchar(200))
@@ -577,7 +575,7 @@ create trigger trgProdHist after insert on tbProduto
             atualizacao = current_timestamp();
   end; &&
   
-select * from tbProdutoHistorico;
+select * from tb_ProdutoHistorico;
 
 call spinsertproduto(12345678910119, 'Água mineral', 1.99, 500);
 
@@ -627,24 +625,23 @@ end &&
 call spinsertconsulta ('Disney Chaplin');
 
 select * from tbCliente;
+select * from tbProduto;
 
 -- Exe 26 -- 
 delimiter && 
 create trigger trg_updatetbProduto after insert on tbItemVenda
 	for each row 
 begin
-UPDATE tbProduto set Qtd = Qtd - NEW.Qtd
-Where CodigoBarras = NEW.CodigoBarras;
+UPDATE tbProduto set Qtd = Qtd - NEW.Qtd Where CodigoBarras = NEW.CodigoBarras;
 end &&
-select  * from tbCliente;
-select  * from tbProduto;
-select * from tbVenda;
-select * from tbItemCompra;
-call spinsertVenda (4,'Disney Chaplin', 12345678910111, 22.22, 1, 64.50, null );
-call spinsertVenda (5,'Disney Chaplin', 12345678910112, 22.220, 1, 64.50, null );
 
 -- Exe 27 --
  /* Perguntar sobre esse exercício ao professor */
- call spinsertVenda (6,'Paganada', 12345678910114, 10.00, 15, 150.00, null );
+ call spinsertVenda (7,'Paganada', 12345678910114, 10.00, 15, 150.00 );
+
+
+select * from tbVenda;
+select * from tbItemVenda;
+select * from tbProduto;
 
 -- 	Exe 28

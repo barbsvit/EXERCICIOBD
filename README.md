@@ -382,33 +382,38 @@ select * from tbproduto;
 describe tbFornecedor;
 describe tbProduto;
 describe tbCompra;
-
--- drop procedure spinsertcompra;
+describe tbItemCompra;
+-- drop procedure spinsertcompra; --
 
 delimiter &&
-create procedure spinsertcompra(vNotaFiscal int, vNome varchar(200), vDataCompra date, vCodigoBarras numeric(14), vValorItem decimal(8,3), vQtdTotal int, vValorTotal decimal(8,2))
+create procedure spinsertcompra(vNotaFiscal int, vNome varchar(200), vDataCompra date, vCodigoBarras numeric(14), vValorItem decimal(8,3), vQtd int, vQtdTotal int, vValorTotal decimal(8,2))
+	
 begin
+	declare eCodigoBarras decimal(14,0);
+    set eCodigoBarras = (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras);
+    
 		if not exists(select NotaFiscal from tbCompra where NotaFiscal = vNotaFiscal) then
-			if exists(select Nome from tbFornecedor where Nome = vNome) and (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
-				insert into tbCompra(NotaFiscal, DataCompra, ValorTotal, QtdTotal, Cod)
-				values(vNotaFiscal, vDataCompra, vValorTotal, vQtdTotal, (select Cod from tbFornecedor where Nome = vNome));
+			if exists(select Cod from tbFornecedor where Nome = vNome) and exists (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
+				insert into tbCompra(NotaFiscal, DataCompra, ValorTotal, QtdTotal)
+				values(vNotaFiscal, vDataCompra, vValorTotal, vQtdTotal);
 			end if;
-		end if;
+		
 	        if not exists(select CodigoBarras from tbItemCompra where (CodigoBarras = vCodigoBarras) and (NotaFiscal = vNotaFiscal))then
-				insert into tbItemCompra(NotaFiscal, CodigoBarras, ValorItem, Qtd)
-				values(vNotaFiscal, vCodigoBarras, vValorItem, vQtdTotal);
+				insert into  tbItemCompra(NotaFiscal, CodigoBarras, ValorItem, Qtd)
+				values((select NotaFiscal from tbCompra where NotaFiscal = vNotaFiscal), vCodigoBarras, vValorItem, vQtd);
                 
+            end if;
             end if;
 end 
 &&    
 
 
 select * from tbItemCompra;
-call spinsertcompra (8459,'amoroso e doce',str_to_date('01/05/2018', '%d/%m/%Y'), 12345678910111, 22.22, 700, 21944.00);
-call spinsertcompra (2482,'revenda chico loco',str_to_date('22/04/2020','%d/%m/%Y'), 12345678910112, 40.50, 180, 7290.00);
-call spinsertcompra (21563,'marcelo dedal',str_to_date('12/07/2020','%d/%m/%Y'), 12345678910113, 3.00, 300, 900.00);
-call spinsertcompra (8459,'amoroso e doce',str_to_date('01/05/2018','%d/%m/%Y'),12345678910114, 35.00, 500, 21944.00);
-call spinsertcompra (156354,'revenda chico loco',str_to_date('23/11/2021','%d/%m/%Y'), 12345678910115, 54.00, 350, 18900.00); 
+call spinsertcompra (8459,'amoroso e doce',str_to_date('01/05/2018', '%d/%m/%Y'), 12345678910111, 22.22, 200, 700, 21944.00);
+call spinsertcompra (2482,'revenda chico loco',str_to_date('22/04/2020','%d/%m/%Y'), 12345678910112, 40.50, 180, 180, 7290.00);
+call spinsertcompra (21563,'marcelo dedal',str_to_date('12/07/2020','%d/%m/%Y'), 12345678910113, 3.00, 300, 300, 900.00);
+call spinsertcompra (8459,'amoroso e doce',str_to_date('01/05/2018','%d/%m/%Y'),12345678910114, 35.00,500, 700, 21944.00);
+call spinsertcompra (156354,'revenda chico loco',str_to_date('23/11/2021','%d/%m/%Y'), 12345678910115, 54.00,350, 350, 18900.00); 
 
 
 select * from tbCompra;
@@ -538,6 +543,8 @@ call spattprod(12345678910111, 'rei do papel mache', 64.50);
 call spattprod(12345678910112, 'bolinha de sabão', 120.00);
 call spattprod(12345678910113, 'carro bate bate', 64.00);
 
+
+
 -- ex 15 --
 delimiter &&
 create procedure spselectproduto()
@@ -608,7 +615,7 @@ select * from tb_ProdutoHistorico;
 select * from tbProduto;
 
 -- EXE 22 -- 
-call spinsertvenda(4, 'Disney Chaplin', '12345678910111', 64.500, 1, 64.500, null )
+call spinsertvenda(4, 'Disney Chaplin', '12345678910111', 64.500, 1, 64.50)
 
 -- exe 23 --
 select * from tbVenda order by NumeroVenda desc limit 1;
@@ -642,6 +649,24 @@ end &&
 
 select * from tbVenda;
 select * from tbItemVenda;
+
+
+-- 	Exe 28 --
 select * from tbProduto;
 
--- 	Exe 28
+-- Exe 29 --
+
+delimiter && 
+create trigger trg_addtbProduto after insert on tbCompra
+	for each row 
+begin
+UPDATE tbProduto set QtdTotal = QtdTotal + NEW.QtdTotal Where NotaFiscal = NEW.NotaFiscal;
+end &&
+
+
+-- Exe 30 --
+call spinsertCompra (10548,'Amoroso e Doce', '2018-05-01', 12345678910111, 40.00, 100, 100, 4000.00 );
+-- Exe 31 -- 
+select * from tbProduto;
+select * from tbCompra;
+select *from tbItemCompra;

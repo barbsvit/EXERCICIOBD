@@ -117,10 +117,6 @@ alter table tbItemVenda add foreign key (CodigoBarras) references tbProduto (Cod
 
 
 -- ex 1
-use dbdistribuidora;
-
-SELECT * FROM tbFornecedor;
-describe tbFornecedor;
 delimiter &&
 create procedure spinsertForne(vCNPJ decimal(14,0), vNome varchar (200), vTelefone decimal (11,0))
 begin
@@ -140,7 +136,6 @@ call spinsertForne(1745678927123, 'marcelo dedal', '11934567802');
 call spinsertForne(1845678927123, 'fransciscano cachaça', '11934567803');  
 call spinsertForne(1945678927123, 'joãozinho chupeta', '11934567804');
 
-SELECT * FROM tbFornecedor;
 -- ex 2
 delimiter &&
 create procedure spinsertCidade(vCidade varchar (200))
@@ -161,7 +156,6 @@ call spinsertCidade('Pirituba');
 call spinsertCidade('Lapa');
 call spinsertCidade('Ponta Grossa');  
 
-SELECT * FROM tbCidade;
 -- ex 3 
 delimiter &&
 create procedure spinsertEstado(vUF char (2))
@@ -177,7 +171,6 @@ call spinsertEstado('SP');
 call spinsertEstado('RJ');
 call spinsertEstado('RS');
 
-select * from tbEstado;
 -- Exe 4. --
 delimiter &&
 create procedure spinsertBairro(vBairro varchar (200))
@@ -194,11 +187,8 @@ call spinsertBairro('Capão Redondo');
 call spinsertBairro('Pirituba');
 call spinsertBairro('Liberdade');
 
-select * from tbBairro;
 
 -- ex 5 
-SELECT * FROM tbProduto;
-describe tbProduto;
 delimiter &&
 create procedure spinsertproduto(vCodigoBarras numeric(14), vNome varchar (200), vValor decimal (8,3), vQtd int)
 begin
@@ -217,14 +207,7 @@ call spinsertproduto(12345678910116,'boneco do hitler', 124.00, 200);
 call spinsertproduto(12345678910117,'farinha de suruí', 50.00, 200);
 call spinsertproduto(12345678910118,'zelador de cemitério', 24.50, 100);
 
--- para ver os registros --
-select * from tbProduto;
-
--- ex 6 -
-SELECT * FROM tbEndereco; 
-describe tbBairro; 
-describe tbEndereco;
-
+-- ex 6 --
 delimiter && 
 create procedure spinsertendereco(vCEP numeric(8), vLogradouro varchar(200), vBairro varchar(200), vCidade varchar(200), vUF char(2)) 
 begin
@@ -248,8 +231,6 @@ end if;
 	end if;
 end &&
 
-
-
 call spinsertendereco(12345050, 'rua da federal', 'Lapa', 'São Paulo', 'SP'); 
 call spinsertendereco(12345051, 'Av Brasil', 'Lapa', 'Campinas', 'SP'); 
 call spinsertendereco(12345052, 'rua liberdade', 'Consolação', 'São Paulo', 'SP'); 
@@ -267,13 +248,6 @@ select * from tbEstado;
 
 
 -- ex 7 
-DESCRIBE tbCliente;
-DESCRIBE tbClientePF;
-DESCRIBE tbClientePJ;
-DESCRIBE tbEndereco;
-select * from tbCliente;
-
--- drop procedure spinsertclientepf;
 delimiter &&
 create procedure spinsertclientepf(vNomeCli varchar(200), vNumEnd smallint, vCompEnd varchar(50), vCepCli numeric(8), vCPF numeric(11), vRG numeric(8), vRG_Dig char(1), vNasc date, vLogradouro varchar(200), vBairro varchar(200), vCidade varchar(200), vUF char(2))
 begin
@@ -310,7 +284,6 @@ end if;
 end if;
 end &&
 
-
 call spinsertclientepf('Pimpão', 325, null, 12345051, 12345678911, 12345678, 0, '2000-10-12', 'Av Brasil', 'Lapa', 'Campinas', 'SP');
 call spinsertclientepf('Disney Chaplin', 89, 'Ap. 12', 12345053, 12345678912, 12345679, 0, '2001-11-21', 'Av Paulista', 'Penha', 'Rio de Janeiro', 'RJ');
 call spinsertclientepf('Marciano', 744, null, 12345054, 12345678913, 12345680, 0, '2001-06-01', 'rua ximbú', 'Penha', 'Rio de Janeiro', 'RJ');
@@ -322,12 +295,7 @@ select * from tbClientePF;
 select * from tbCliente;
 select * from tbEndereco;
 
--- ex 8 
-DESCRIBE tbCliente;
-DESCRIBE tbClientePJ;
-DESCRIBE tbEndereco;
-select * from tbEndereco;
-
+-- ex 8 --
 delimiter &&
 create procedure spinsertclientepj(vNomeCli varchar(200), vNumEnd smallint, vCompEnd varchar(50), vCepCli numeric(8), vCNPJ numeric(14), vIE numeric(11), vLogradouro varchar(200), vBairro varchar(200), vCidade varchar(200), vUF char(2))
 begin
@@ -375,16 +343,7 @@ select * from tbClientePJ;
 select * from tbCliente;
 select * from tbEndereco;
 
--- ex 9 
-select * from tbFornecedor;
-select * from tbCompra;
-select * from tbproduto;
-describe tbFornecedor;
-describe tbProduto;
-describe tbCompra;
-describe tbItemCompra;
--- drop procedure spinsertcompra; --
-
+-- ex 9 --
 delimiter &&
 create procedure spinsertcompra(vNotaFiscal int, vNome varchar(200), vDataCompra date, vCodigoBarras numeric(14), vValorItem decimal(8,3), vQtd int, vQtdTotal int, vValorTotal decimal(8,2))
 	
@@ -394,8 +353,8 @@ begin
     
 		if not exists(select NotaFiscal from tbCompra where NotaFiscal = vNotaFiscal) then
 			if exists(select Cod from tbFornecedor where Nome = vNome) and exists (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
-				insert into tbCompra(NotaFiscal, DataCompra, ValorTotal, QtdTotal)
-				values(vNotaFiscal, vDataCompra, vValorTotal, vQtdTotal);
+				insert into tbCompra(NotaFiscal, DataCompra, ValorTotal, QtdTotal,Cod)
+				values(vNotaFiscal, vDataCompra, vValorTotal, vQtdTotal,(select Cod from tbFornecedor where Nome = vNome) );
 			end if;
 		
 	        if not exists(select CodigoBarras from tbItemCompra where (CodigoBarras = vCodigoBarras) and (NotaFiscal = vNotaFiscal))then
@@ -407,8 +366,6 @@ begin
 end 
 &&    
 
-
-select * from tbItemCompra;
 call spinsertcompra (8459,'amoroso e doce',str_to_date('01/05/2018', '%d/%m/%Y'), 12345678910111, 22.22, 200, 700, 21944.00);
 call spinsertcompra (2482,'revenda chico loco',str_to_date('22/04/2020','%d/%m/%Y'), 12345678910112, 40.50, 180, 180, 7290.00);
 call spinsertcompra (21563,'marcelo dedal',str_to_date('12/07/2020','%d/%m/%Y'), 12345678910113, 3.00, 300, 300, 900.00);
@@ -420,14 +377,8 @@ select * from tbCompra;
 select * from tbItemCompra;
 DESCRIBE tbCompra;
 
--- ver os resultados --
-select * from tbCompra;
-select * from tbItemCompra;
-
 ----------------------------------------------------------------------------------
--- ex 10
--- drop procedure spInsertVenda;
-
+-- ex 10 --
 delimiter &&
 create procedure spinsertvenda(vNumeroVenda int, vNomeCli varchar(200), vCodigoBarras numeric(14,0),
                                vValorItem decimal(8,3), vQtd int, vTotalVenda decimal(8,3))
@@ -450,8 +401,6 @@ begin
              select 'Cliente ou produto não cadastrado' as 'Atenção!';
 		end if;
 end &&
-describe tbItemVenda;
-describe tbNota_Fiscal;
 
 call spInsertVenda(1, "Pimpão", 12345678910111, 54.61, 1, 54.61);
 call spInsertVenda(2, "Lança Perfume", 12345678910112, 100.45, 2, 200.90);
@@ -511,7 +460,6 @@ select * from tbProduto;
 -- ex 13 --
 select * from tbProduto;
 
-    -- poderia ser só o codigo de barras no where do delete ja que é pk e nao tem o risco de excluir algum produto atualizado 
 delimiter &&
 create procedure spexcprod(vCodigoBarras numeric(14), vNome varchar (200), vValor decimal (8,3), vQtd int)
 begin
@@ -657,12 +605,12 @@ select * from tbProduto;
 -- Exe 29 --
 
 delimiter && 
-create trigger trg_addtbProduto after insert on tbCompra
+create trigger trg_addtbProduto after insert on tbItemCompra
 	for each row 
 begin
-UPDATE tbProduto set QtdTotal = QtdTotal + NEW.QtdTotal Where NotaFiscal = NEW.NotaFiscal;
+UPDATE tbProduto set Qtd = Qtd + NEW.Qtd Where CodigoBarras = NEW.CodigoBarras;
 end &&
-
+describe tbCompra;
 
 -- Exe 30 --
 call spinsertCompra (10548,'Amoroso e Doce', '2018-05-01', 12345678910111, 40.00, 100, 100, 4000.00 );
@@ -672,22 +620,20 @@ select * from tbCompra;
 select *from tbItemCompra;
 
 -- Exercício 32 -- 
-select tbCliente.ID, tbCliente.NomeCli, tbCliente.NumEnd, tbCliente.CompEnd, tbCliente.CEPCli as CEP, 
+select tbCliente.ID, tbCliente.NomeCli, tbCliente.NumEnd, tbCliente.CompEnd, tbCliente.CepCli as CEP, 
 		tbClientePF.CPF, tbClientePF.RG, tbClientePF.RG_Dig, tbClientePF.Nasc, tbClientePF.ID
 FROM 
     tbCliente
 INNER JOIN 
-    tbClientePF ON tbCliente.ID = tbCliente.ID;
-    
-    
+    tbClientePF ON tbCliente.ID = tbClientePF.ID;
+ 
 -- Exercício 33 --
 select tbCliente.ID, tbCliente.NomeCli, tbCliente.NumEnd, tbCliente.CompEnd, tbCliente.CEPCli as CEP, 
 		tbClientePJ.CNPJ, tbClientePJ.IE, tbClientePJ.ID
 FROM 
     tbCliente
 INNER JOIN 
-    tbcliente_pj ON tbcliente.Id = tbcliente_pj.Id;
-    
+    tbClientePJ ON tbCliente.ID = tbClientePJ.ID;
     
 -- Exercício 34 --
 select tbCliente.ID, tbCliente.NomeCli, 
@@ -704,7 +650,7 @@ select tbCliente.ID, tbCliente.NomeCli,
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PF ON tbCliente.ID = tbClientePF.ID;
+    tbClientePF ON tbCliente.ID = tbClientePF.ID;
     
     
 -- Exercício 36 --
@@ -718,11 +664,11 @@ INNER JOIN  tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP;
 -- Exercício 37 --
 SELECT 
     tbCliente.ID, tbCliente.NomeCli, tbCliente.CEPCli as CEP,
-    tbEndereco.lougradouro, tbCliente.NumEnd, tbCliente.CompEnd, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
+    tbEndereco.logradouro, tbCliente.NumEnd, tbCliente.CompEnd, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PJ ON tbCliente.ID = tbClientePJ.ID
+    tbClientePJ ON tbCliente.ID = tbClientePJ.ID
 INNER JOIN 
     tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
 INNER JOIN 
@@ -733,17 +679,18 @@ INNER JOIN
     tbEstado ON tbEndereco.UFId = tbEstado.UFID;
     
 -- Exercício 38 --
+
 delimiter && 
 create procedure spSelectClientePFisica (vID int) 
 begin     
 select tbCliente.ID as Código, tbCliente.NomeCli as Nome, 
 		tbClientePF.CPF, tbClientePF.RG, tbClientePF.RG_Dig as Digito, tbClientePF.Nasc as 'Data de Nascimento',
         tbcliente.CEPCli as CEP, 
-        tbEndereco.lougradouro, tbCliente.NumEnd as Número, tbCliente.CompEnd as Complemento, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
+        tbEndereco.Logradouro, tbCliente.NumEnd as Número, tbCliente.CompEnd as Complemento, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PF ON tbCliente.ID = tbClientePF.ID
+    tbClientePF ON tbCliente.ID = tbClientePF.ID
     INNER JOIN 
     tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
 INNER JOIN 
@@ -763,33 +710,38 @@ call spSelectClientePFisica (5);
 -- Exercício 39 --
 SELECT *
 FROM tbProduto
-LEFT JOIN tbItem_Venda
-ON tbProduto.CodigoBarras = tbItem_Venda.CodigoBarras;
+LEFT JOIN tbItemVenda
+ON tbProduto.CodigoBarras = tbItemVenda.CodigoBarras;
 
 -- Exercício 40 --
 SELECT *
 FROM tbCompra
 RIGHT JOIN tbFornecedor
-ON tbCompra.Codigo = tbFornecedor.Codigo;
+ON tbCompra.Cod = tbFornecedor.Cod;
+
+select * from tbCompra;
+
+
+
 
 -- Exercício 41 --
-SELECT tbFornecedor.Codigo, tbFornecedor.CNPJ, tbFornecedor.Nome, tbFornecedor.Telefone
+SELECT tbFornecedor.Cod, tbFornecedor.CNPJ, tbFornecedor.Nome, tbFornecedor.Telefone
 FROM tbFornecedor
-RIGHT JOIN tbcompra ON tbFornecedor.Codigo = tbcompra.codigo;
+RIGHT JOIN tbcompra ON tbFornecedor.Cod = tbcompra.Cod;
 
 -- Exercício 42 --
 SELECT tbCliente.ID, tbCliente.NomeCli, 
 		tbVenda.DataVenda,
 		tbProduto.CodigoBarras, tbProduto.Nome, 
-		tbItem_Venda.ValorItem
+		tbItemVenda.ValorItem
 FROM tbCliente
-LEFT JOIN tbVenda ON tbcliente.Id = tbVenda.Id_Cli
-LEFT JOIN tbItem_Venda ON tbVenda.Id_Cli = tbItem_Venda.NumeroVenda
-LEFT JOIN tbProduto ON tbItem_Venda.CodigoBarras = tbProduto.CodigoBarras
+LEFT JOIN tbVenda ON tbCliente.ID = tbVenda.Id_Cli
+LEFT JOIN tbItemVenda ON tbVenda.Id_Cli = tbItemVenda.NumeroVenda
+LEFT JOIN tbProduto ON tbItemVenda.CodigoBarras = tbProduto.CodigoBarras
 WHERE tbVenda.DataVenda IS NOT NULL
 ORDER BY tbCliente.NomeCli;
 
--- Exercício 43 --
+/* Exercício 43 --
 SELECT tbBairro.Bairro
 FROM tbBairro
 LEFT JOIN tbEndereco ON tbBairro.BairroId = tbEndereco.BairroId
@@ -797,3 +749,4 @@ LEFT JOIN tbCliente ON tbEndereco.CEP = tbCliente.CEPCli
 LEFT JOIN tbVenda ON tbCliente.Id = tbVenda.Id_Cli
 WHERE tbVenda.TotalVenda IS NULL
 GROUP BY tbBairro.Bairro;
+*/

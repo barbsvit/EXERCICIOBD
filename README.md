@@ -672,17 +672,17 @@ select * from tbCompra;
 select *from tbItemCompra;
 
 -- Exercício 32 -- 
-select tbcliente.Id, tbcliente.NomeCli, tbcliente.NumEnd, tbcliente.CompEnd, tbcliente.CEPCli as CEP, 
-		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.RG_Dig, tbcliente_pf.Nasc, tbcliente_pf.id 
+select tbCliente.ID, tbCliente.NomeCli, tbCliente.NumEnd, tbCliente.CompEnd, tbCliente.CEPCli as CEP, 
+		tbClientePF.CPF, tbClientePF.RG, tbClientePF.RG_Dig, tbClientePF.Nasc, tbClientePF.ID
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id;
+    tbClientePF ON tbCliente.ID = tbCliente.ID;
     
     
 -- Exercício 33 --
-select tbcliente.Id, tbcliente.NomeCli, tbcliente.NumEnd, tbcliente.CompEnd, tbcliente.CEPCli as CEP, 
-		tbcliente_pj.CNPJ, tbcliente_pj.IE, tbcliente_pj.Id
+select tbCliente.ID, tbCliente.NomeCli, tbCliente.NumEnd, tbCliente.CompEnd, tbCliente.CEPCli as CEP, 
+		tbClientePJ.CNPJ, tbClientePJ.IE, tbClientePJ.ID
 FROM 
     tbCliente
 INNER JOIN 
@@ -690,68 +690,68 @@ INNER JOIN
     
     
 -- Exercício 34 --
-select tbcliente.Id, tbcliente.NomeCli, 
-		tbcliente_pj.CNPJ, tbcliente_pj.IE, tbcliente_pj.Id
+select tbCliente.ID, tbCliente.NomeCli, 
+		tbClientePJ.CNPJ, tbClientePJ.IE, tbClientePJ.ID
 FROM 
     tbCliente
 INNER JOIN 
-    tbcliente_pj ON tbcliente.Id = tbcliente_pj.Id;
+    tbClientePJ ON tbCliente.ID = tbClientePJ.ID;
     
     
 -- Exercício 35 --
-select tbcliente.Id, tbcliente.NomeCli,
-		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.Nasc
+select tbCliente.ID, tbCliente.NomeCli,
+		tbClientePF.CPF, tbClientePF.RG, tbClientePF.Nasc
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id;
+    tbCliente_PF ON tbCliente.ID = tbClientePF.ID;
     
     
 -- Exercício 36 --
 SELECT 
 	*
  FROM tbCliente 
-INNER JOIN  tbCliente_pj ON tbCliente.Id = tbCliente_pj.Id 
-INNER JOIN  tbEndereco ON tbCliente.CEPCli = tbEndereco.Cep;
+INNER JOIN  tbClientePJ ON tbCliente.ID = tbClientePJ.ID 
+INNER JOIN  tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP;
 
 
 -- Exercício 37 --
 SELECT 
-    tbCliente.Id, tbCliente.NomeCli, tbCliente.CEPCli as CEP,
+    tbCliente.ID, tbCliente.NomeCli, tbCliente.CEPCli as CEP,
     tbEndereco.lougradouro, tbCliente.NumEnd, tbCliente.CompEnd, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PJ ON tbCliente.Id = tbCliente_PJ.Id
+    tbCliente_PJ ON tbCliente.ID = tbClientePJ.ID
 INNER JOIN 
     tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
 INNER JOIN 
-    tbBairro ON tbEndereco.BairroId = tbBairro.BairroId
+    tbBairro ON tbEndereco.BairroId = tbBairro.BairroID
 INNER JOIN 
-    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeId
+    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeID
 INNER JOIN 
-    tbEstado ON tbEndereco.UFId = tbEstado.UFId;
+    tbEstado ON tbEndereco.UFId = tbEstado.UFID;
     
 -- Exercício 38 --
 delimiter && 
-create procedure spSelectClientePFisica (vId int) 
+create procedure spSelectClientePFisica (vID int) 
 begin     
-select tbcliente.Id as Código, tbcliente.NomeCli as Nome, 
-		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.RG_Dig as Digito, tbcliente_pf.Nasc as 'Data de Nascimento',
+select tbCliente.ID as Código, tbCliente.NomeCli as Nome, 
+		tbClientePF.CPF, tbClientePF.RG, tbClientePF.RG_Dig as Digito, tbClientePF.Nasc as 'Data de Nascimento',
         tbcliente.CEPCli as CEP, 
         tbEndereco.lougradouro, tbCliente.NumEnd as Número, tbCliente.CompEnd as Complemento, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
 FROM 
     tbCliente
 INNER JOIN 
-    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id
+    tbCliente_PF ON tbCliente.ID = tbClientePF.ID
     INNER JOIN 
     tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
 INNER JOIN 
-    tbBairro ON tbEndereco.BairroId = tbBairro.BairroId
+    tbBairro ON tbEndereco.BairroId = tbBairro.BairroID
 INNER JOIN 
-    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeId
+    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeID
 INNER JOIN 
-    tbEstado ON tbEndereco.UFId = tbEstado.UFId
+    tbEstado ON tbEndereco.UFID = tbEstado.UFID
       WHERE 
         tbCliente.Id = vId;
 end && 
@@ -778,7 +778,7 @@ FROM tbFornecedor
 RIGHT JOIN tbcompra ON tbFornecedor.Codigo = tbcompra.codigo;
 
 -- Exercício 42 --
-SELECT tbcliente.Id, tbcliente.NomeCli, 
+SELECT tbCliente.ID, tbCliente.NomeCli, 
 		tbVenda.DataVenda,
 		tbProduto.CodigoBarras, tbProduto.Nome, 
 		tbItem_Venda.ValorItem
@@ -787,7 +787,7 @@ LEFT JOIN tbVenda ON tbcliente.Id = tbVenda.Id_Cli
 LEFT JOIN tbItem_Venda ON tbVenda.Id_Cli = tbItem_Venda.NumeroVenda
 LEFT JOIN tbProduto ON tbItem_Venda.CodigoBarras = tbProduto.CodigoBarras
 WHERE tbVenda.DataVenda IS NOT NULL
-ORDER BY tbcliente.NomeCli;
+ORDER BY tbCliente.NomeCli;
 
 -- Exercício 43 --
 SELECT tbBairro.Bairro

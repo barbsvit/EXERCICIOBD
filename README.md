@@ -670,3 +670,130 @@ call spinsertCompra (10548,'Amoroso e Doce', '2018-05-01', 12345678910111, 40.00
 select * from tbProduto;
 select * from tbCompra;
 select *from tbItemCompra;
+
+-- Exercício 32 -- 
+select tbcliente.Id, tbcliente.NomeCli, tbcliente.NumEnd, tbcliente.CompEnd, tbcliente.CEPCli as CEP, 
+		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.RG_Dig, tbcliente_pf.Nasc, tbcliente_pf.id 
+FROM 
+    tbCliente
+INNER JOIN 
+    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id;
+    
+    
+-- Exercício 33 --
+select tbcliente.Id, tbcliente.NomeCli, tbcliente.NumEnd, tbcliente.CompEnd, tbcliente.CEPCli as CEP, 
+		tbcliente_pj.CNPJ, tbcliente_pj.IE, tbcliente_pj.Id
+FROM 
+    tbCliente
+INNER JOIN 
+    tbcliente_pj ON tbcliente.Id = tbcliente_pj.Id;
+    
+    
+-- Exercício 34 --
+select tbcliente.Id, tbcliente.NomeCli, 
+		tbcliente_pj.CNPJ, tbcliente_pj.IE, tbcliente_pj.Id
+FROM 
+    tbCliente
+INNER JOIN 
+    tbcliente_pj ON tbcliente.Id = tbcliente_pj.Id;
+    
+    
+-- Exercício 35 --
+select tbcliente.Id, tbcliente.NomeCli,
+		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.Nasc
+FROM 
+    tbCliente
+INNER JOIN 
+    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id;
+    
+    
+-- Exercício 36 --
+SELECT 
+	*
+ FROM tbCliente 
+INNER JOIN  tbCliente_pj ON tbCliente.Id = tbCliente_pj.Id 
+INNER JOIN  tbEndereco ON tbCliente.CEPCli = tbEndereco.Cep;
+
+
+-- Exercício 37 --
+SELECT 
+    tbCliente.Id, tbCliente.NomeCli, tbCliente.CEPCli as CEP,
+    tbEndereco.lougradouro, tbCliente.NumEnd, tbCliente.CompEnd, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
+FROM 
+    tbCliente
+INNER JOIN 
+    tbCliente_PJ ON tbCliente.Id = tbCliente_PJ.Id
+INNER JOIN 
+    tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
+INNER JOIN 
+    tbBairro ON tbEndereco.BairroId = tbBairro.BairroId
+INNER JOIN 
+    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeId
+INNER JOIN 
+    tbEstado ON tbEndereco.UFId = tbEstado.UFId;
+    
+-- Exercício 38 --
+delimiter && 
+create procedure spSelectClientePFisica (vId int) 
+begin     
+select tbcliente.Id as Código, tbcliente.NomeCli as Nome, 
+		tbcliente_pf.CPF, tbcliente_pf.RG, tbcliente_pf.RG_Dig as Digito, tbcliente_pf.Nasc as 'Data de Nascimento',
+        tbcliente.CEPCli as CEP, 
+        tbEndereco.lougradouro, tbCliente.NumEnd as Número, tbCliente.CompEnd as Complemento, tbBairro.Bairro, tbCidade.Cidade, tbEstado.UF
+FROM 
+    tbCliente
+INNER JOIN 
+    tbCliente_PF ON tbcliente.Id = tbcliente_pf.Id
+    INNER JOIN 
+    tbEndereco ON tbCliente.CEPCli = tbEndereco.CEP
+INNER JOIN 
+    tbBairro ON tbEndereco.BairroId = tbBairro.BairroId
+INNER JOIN 
+    tbCidade ON tbEndereco.CidadeId = tbCidade.CidadeId
+INNER JOIN 
+    tbEstado ON tbEndereco.UFId = tbEstado.UFId
+      WHERE 
+        tbCliente.Id = vId;
+end && 
+call spSelectClientePFisica (2);
+
+call spSelectClientePFisica (5);
+
+
+-- Exercício 39 --
+SELECT *
+FROM tbProduto
+LEFT JOIN tbItem_Venda
+ON tbProduto.CodigoBarras = tbItem_Venda.CodigoBarras;
+
+-- Exercício 40 --
+SELECT *
+FROM tbCompra
+RIGHT JOIN tbFornecedor
+ON tbCompra.Codigo = tbFornecedor.Codigo;
+
+-- Exercício 41 --
+SELECT tbFornecedor.Codigo, tbFornecedor.CNPJ, tbFornecedor.Nome, tbFornecedor.Telefone
+FROM tbFornecedor
+RIGHT JOIN tbcompra ON tbFornecedor.Codigo = tbcompra.codigo;
+
+-- Exercício 42 --
+SELECT tbcliente.Id, tbcliente.NomeCli, 
+		tbVenda.DataVenda,
+		tbProduto.CodigoBarras, tbProduto.Nome, 
+		tbItem_Venda.ValorItem
+FROM tbCliente
+LEFT JOIN tbVenda ON tbcliente.Id = tbVenda.Id_Cli
+LEFT JOIN tbItem_Venda ON tbVenda.Id_Cli = tbItem_Venda.NumeroVenda
+LEFT JOIN tbProduto ON tbItem_Venda.CodigoBarras = tbProduto.CodigoBarras
+WHERE tbVenda.DataVenda IS NOT NULL
+ORDER BY tbcliente.NomeCli;
+
+-- Exercício 43 --
+SELECT tbBairro.Bairro
+FROM tbBairro
+LEFT JOIN tbEndereco ON tbBairro.BairroId = tbEndereco.BairroId
+LEFT JOIN tbCliente ON tbEndereco.CEP = tbCliente.CEPCli
+LEFT JOIN tbVenda ON tbCliente.Id = tbVenda.Id_Cli
+WHERE tbVenda.TotalVenda IS NULL
+GROUP BY tbBairro.Bairro;

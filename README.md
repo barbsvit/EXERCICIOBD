@@ -355,6 +355,12 @@ begin
 			if exists(select Cod from tbFornecedor where Nome = vNome) and exists (select CodigoBarras from tbProduto where CodigoBarras = vCodigoBarras) then
 				insert into tbCompra(NotaFiscal, DataCompra, ValorTotal, QtdTotal,Cod)
 				values(vNotaFiscal, vDataCompra, vValorTotal, vQtdTotal,(select Cod from tbFornecedor where Nome = vNome) );
+
+    
+				insert into  tbItemCompra(NotaFiscal, CodigoBarras, ValorItem, Qtd)
+				values((select NotaFiscal from tbCompra where NotaFiscal = vNotaFiscal), vCodigoBarras, vValorItem, vQtd);
+                
+    
 			end if;
 		
 	        if not exists(select CodigoBarras from tbItemCompra where (CodigoBarras = vCodigoBarras) and (NotaFiscal = vNotaFiscal))then

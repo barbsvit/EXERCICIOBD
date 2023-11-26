@@ -747,7 +747,7 @@ LEFT JOIN tbProduto ON tbItemVenda.CodigoBarras = tbProduto.CodigoBarras
 WHERE tbVenda.DataVenda IS NOT NULL
 ORDER BY tbCliente.NomeCli;
 
-/* Exercício 43 --
+-- Exercício 43 --
 SELECT tbBairro.Bairro
 FROM tbBairro
 LEFT JOIN tbEndereco ON tbBairro.BairroId = tbEndereco.BairroId
@@ -755,4 +755,4 @@ LEFT JOIN tbCliente ON tbEndereco.CEP = tbCliente.CEPCli
 LEFT JOIN tbVenda ON tbCliente.Id = tbVenda.Id_Cli
 WHERE tbVenda.TotalVenda IS NULL
 GROUP BY tbBairro.Bairro;
-*/
+
